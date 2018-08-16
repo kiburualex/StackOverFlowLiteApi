@@ -1,4 +1,3 @@
-from flask import jsonify, Blueprint
 from flask_restplus import Resource, Api
 
 api = Api(version='1.0', title='StackOverflow Lite API',

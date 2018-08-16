@@ -1,5 +1,5 @@
 # Flask settings
-FLASK_SERVER_NAME = 'localhost:8888'
+FLASK_SERVER_NAME = '127.0.0.1:8888'
 FLASK_DEBUG = True  # Do not use debug mode in production
 
 # Flask-Restplus settings
@@ -12,7 +12,6 @@ RESTPLUS_ERROR_404_HELP = False
 SQLALCHEMY_DATABASE_URI = 'sqlite:///db.sqlite'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-
-FLASK_APP="run.py"
-APP_ENVIRONMENT_SETTINGS="development"
-SECRET="a-long-string-of-random-characters-CHANGE-TO-YOUR-LIKING"
+FLASK_APP = "run.py"
+APP_ENVIRONMENT_SETTINGS = "development"
+SECRET = "a-long-string-of-random-characters-CHANGE-TO-YOUR-LIKING"
