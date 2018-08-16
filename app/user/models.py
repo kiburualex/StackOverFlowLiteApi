@@ -1,18 +1,17 @@
-
 class User():
     def __init__(self, api):
         self.api = api
         self.counter = 0
         self.users = [
             {
-                'id': 1, 
-                'name': 'Alex Kiburu', 
+                'id': 1,
+                'name': 'Alex Kiburu',
                 'email': 'alexkiburu18@gmail.com',
                 'password': 'saf&&#d12'
             },
             {
-                'id': 2, 
-                'name': 'James Konan', 
+                'id': 2,
+                'name': 'James Konan',
                 'email': 'jk@gmail.com',
                 'password': '1121**#d12'
             },

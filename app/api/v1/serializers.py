@@ -8,6 +8,13 @@ question = api.model('Question', {
     'answers': fields.List(cls_or_instance=fields.Raw)
 })
 
+answer = api.model('Answer', {
+    'id': fields.Integer(readOnly=True, description='The question unique identifier'),
+    'answer': fields.String(required=True, description='The answer given'),
+    'user': fields.String(required=True, description='The name of the user')
+})
+
+
 user = api.model('User', {
     'id': fields.Integer(readOnly=True, description='The user unique identifier'),
     'name': fields.String(required=True, description='The name of the user'),
