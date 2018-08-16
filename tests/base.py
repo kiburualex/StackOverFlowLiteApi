@@ -3,7 +3,7 @@ import unittest
 from app.api.v1 import api
 from app.api.v1.question import ns as questions_namespace
 from app.api.v1.user import ns as users_namespace
-from app.configuration.config import create_app
+from config import create_app
 
 
 """ Base Test case class, initialize variables and settings """
