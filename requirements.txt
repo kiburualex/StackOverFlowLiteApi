@@ -5,3 +5,4 @@ Flask-API==1.0
 flask-restplus==0.11.0
 pylint==2.1.1
 pytest==3.0.7
+pytest-cov==2.5.1
