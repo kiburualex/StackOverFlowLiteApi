@@ -1,6 +1,5 @@
 # BUILD A PRODUCT: StackOverflow-lite API
 [![Build Status](https://travis-ci.org/kiburualex/StackOverFlowLiteApi.svg?branch=master)](https://travis-ci.org/kiburualex/StackOverFlowLiteApi)
-[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 <a href="https://codeclimate.com/github/kiburualex/StackOverFlowLiteApi/maintainability"><img src="https://api.codeclimate.com/v1/badges/c024f75da2dbf983f64b/maintainability" /></a>
 [![Coverage Status](https://coveralls.io/repos/github/kiburualex/StackOverFlowLiteApi/badge.svg?branch=master)](https://coveralls.io/github/kiburualex/StackOverFlowLiteApi?branch=master)
 
