@@ -1,8 +1,8 @@
+import settings
 from app.api.v1 import api
 from app.api.v1.question import ns as questions_namespace
 from app.api.v1.user import ns as users_namespace
-from app.configuration.config import create_app
-from app.configuration import settings
+from config import create_app
 
 config_name = settings.APP_ENVIRONMENT_SETTINGS  # config_name = "development"
 app = create_app(config_name)

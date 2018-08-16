@@ -1,6 +1,7 @@
 from flask_api import FlaskAPI
 # local import
-from app.configuration import settings
+# from app.configuration import settings
+import settings
 
 
 class Config(object):
@@ -8,8 +9,7 @@ class Config(object):
     DEBUG = False
     CSRF_ENABLED = True
     SECRET = settings.SECRET
-    # Flask settings
-    SERVER_NAME = settings.FLASK_SERVER_NAME
+
     # Flask-Restplus settings
     SWAGGER_UI_DOC_EXPANSION = settings.RESTPLUS_SWAGGER_UI_DOC_EXPANSION
     RESTPLUS_VALIDATE = settings.RESTPLUS_VALIDATE
