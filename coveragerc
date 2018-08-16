@@ -1,0 +1,11 @@
+[run]
+omit =
+    venv/*
+    */python?.?/*
+    */site-packages/nose/*
+
+[report]
+omit =
+    app/error.py
+    venv/*
+*/python?.?/*
