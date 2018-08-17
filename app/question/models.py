@@ -1,49 +1,41 @@
 class Question():
     def __init__(self, api):
         self.api = api
-        self.counter = 0
         self.questions = [
             {
-                'id': 1,
-                'title': 'Build an API',
-                'description': 'How does one build an api',
-                'answers': [
+                "id": 1,
+                "title": "Build an API",
+                "description": "How does one build an api",
+                "answers": [
                     {
-                        'id': 1,
-                        'answer': 'Sample Answer',
-                        'user': 'Leah'
-                    },
-                    {
-                        'id': 2,
-                        'answer': 'Sample Answer 2',
-                        'user': 'Kim'
+                        "id": 1,
+                        "answer": "Sample Answer",
+                        "user": "Paul"
                     }
-                ]
-            },
-            {
-                'id': 2,
-                'title': 'Learn React',
-                'description': 'Read the documents',
-                'answers': [
-                    {
-                        'id': 3,
-                        'answer': 'Sample Answer',
-                        'user': 'Paul'
-                    },
                 ]
             }
         ]
 
-    def get(self, id):
+    def get(self, question_id):
         for question in self.questions:
-            if question['id'] == id:
+            if question['id'] == question_id:
                 return question
-        self.api.abort(404, "Question {} doesn't exist".format(id))
+        self.api.abort(404, "Question {} doesn't exist".format(question_id))
 
     def create(self, data):
-        question = data
-        question['id'] = self.counter = self.counter + 1
+        question = dict()
+        question['title'] = str(data.get('title'))
+        question['description'] = str(data.get('description'))
+        question['answers'] = []
+
+        """ Ensure table id column value is unique """
+        try:
+            question['id'] = int(self.questions[-1].get('id')) + 1
+        except Exception as e:
+            question['id'] = 1
+
         self.questions.append(question)
+
         return question
 
     def update(self, id, data):

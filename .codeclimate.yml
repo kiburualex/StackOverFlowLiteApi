@@ -1,0 +1,8 @@
+version: "1"
+checks:
+  similar-code:
+    config:
+      threshold: 50
+  identical-code:
+    config:
+      threshold: 25
