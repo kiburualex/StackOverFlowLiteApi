@@ -26,10 +26,10 @@ class UserTestCase(BaseTestCase):
         """Test API can edit an existing user. (PUT request)"""
 
         user = {
-            'id': 1,
-            'name': 'Alex Kiburu',
-            'email': 'alexkiburu18@gmail.com',
-            'password': 'saf&&#d12'
+            "id": 1,
+            "name": "Alex Kiburu",
+            "email": "alexkiburu18@gmail.com",
+            "password": "saf&&#d12"
         }
         response = self.client.put(self.endpoint + '1/',
                                     data=json.dumps(user),
@@ -39,7 +39,6 @@ class UserTestCase(BaseTestCase):
 
         content = json.loads(results.get_data(as_text=True))
         self.assertEqual(content, user)
-
 
     def test_register_user(self):
         """Test API can create a user (POST request)"""
@@ -54,9 +53,6 @@ class UserTestCase(BaseTestCase):
                                     content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.content_type, 'application/json')
-
-        content = json.loads(response.get_data(as_text=True))
-        self.assertEqual(content, user)
 
 
 if __name__ == '__main__':
