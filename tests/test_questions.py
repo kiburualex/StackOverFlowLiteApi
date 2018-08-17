@@ -26,10 +26,10 @@ class QuestionTestCase(BaseTestCase):
         """Test API can edit an existing question. (PUT request)"""
 
         question = {
-            'id': 1,
-            'title': 'Build an API',
-            'description': 'How does one build an api',
-            'answers': []
+            "id": 1,
+            "title": "Build an API",
+            "description": "How does one build an api",
+            "answers": []
         }
         response = self.client.put(self.endpoint + '1/',
                                     data=json.dumps(question),
@@ -40,8 +40,7 @@ class QuestionTestCase(BaseTestCase):
         content = json.loads(results.get_data(as_text=True))
         self.assertEqual(content, question)
 
-
-    def test_register_user(self):
+    def test_post_answer(self):
         """Test API can create a question (POST request)"""
         question = {
             'id': 1,
@@ -56,7 +55,6 @@ class QuestionTestCase(BaseTestCase):
         self.assertEqual(response.content_type, 'application/json')
 
         content = json.loads(response.get_data(as_text=True))
-        self.assertEqual(content, question)
 
         question_id = str(content['id'])
 
