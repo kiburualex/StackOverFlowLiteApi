@@ -25,10 +25,10 @@ https://kiburu-stacklyte-api-heroku.herokuapp.com/
     headers = {content_type:application/json}
 
     {
-        'id': 1,
-        'title': 'Building an API',
-        'description': 'How does one build an api?',
-        'answers': []
+        "id": 1,
+        "title": "Build an API",
+        "description": "How does one build an api",
+        "answers": []
     }
     ```
 * #### Fetch all questions.
@@ -51,9 +51,9 @@ https://kiburu-stacklyte-api-heroku.herokuapp.com/
     headers = {content_type:application/json}
 
     {
-        'id': 1,
-        'answer': 'Sample Answer',
-        'user': 'Leah'
+        "id": 1,
+        "answer": "Sample Answer",
+        "user": "Leah"
     }
     ```
 

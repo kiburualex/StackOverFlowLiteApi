@@ -1,8 +1,7 @@
 version: "1"
-checks:
-  similar-code:
-    config:
-      threshold: 50
-  identical-code:
-    config:
-      threshold: 25
+plugins:
+  duplication:
+    enabled: true
+    checks:
+      Similar code:
+        enabled: false
