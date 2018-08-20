@@ -3,6 +3,8 @@ Flask==0.12.1
 Flask-API==1.0
 #Flask-RESTful==0.3.5
 flask-restplus==0.11.0
+passlib==1.7.1
+psycopg2==2.7.5
 pylint==2.1.1
 pytest==3.0.7
 pytest-cov==2.5.1

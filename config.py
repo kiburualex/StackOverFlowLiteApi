@@ -10,7 +10,7 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET = settings.SECRET
 
-    # Flask-Restplus settings
+    """ Flask-Restplus settings """
     SWAGGER_UI_DOC_EXPANSION = settings.RESTPLUS_SWAGGER_UI_DOC_EXPANSION
     RESTPLUS_VALIDATE = settings.RESTPLUS_VALIDATE
     RESTPLUS_MASK_SWAGGER = settings.RESTPLUS_MASK_SWAGGER
@@ -46,6 +46,7 @@ app_config = {
     'staging': StagingConfig,
     'production': ProductionConfig,
 }
+
 
 def create_app(config_name):
     """Create a flask app instance."""
