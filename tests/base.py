@@ -6,9 +6,8 @@ from app.api.v1.user import ns as users_namespace
 from config import create_app
 
 
-""" Base Test case class, initialize variables and settings """
 class BaseTestCase(unittest.TestCase):
-    """A base test case."""
+    """ Base Test case class, initialize variables and settings """
 
     def setUp(self):
         """Define test variables and initialize app."""

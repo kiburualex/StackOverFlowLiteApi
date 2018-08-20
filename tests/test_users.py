@@ -22,6 +22,11 @@ class UserTestCase(BaseTestCase):
         response = self.client.get(self.endpoint + '1/')
         self.assertEqual(response.status_code, 200)
 
+    def test_error_status_on_not_found_user_id(self):
+        """Test a 404 error when user id is not found."""
+        response = self.client.get(self.endpoint + '100/')
+        self.assertEqual(response.status_code, 404)
+
     def test_user_can_be_edited(self):
         """Test API can edit an existing user. (PUT request)"""
 
