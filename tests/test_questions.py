@@ -35,6 +35,7 @@ class QuestionTestCase(BaseTestCase):
             "id": 1,
             "title": "Build an API",
             "description": "How does one build an api",
+            "user": "john doe",
             "answers": []
         }
         response = self.client.put(self.endpoint + '1/',
