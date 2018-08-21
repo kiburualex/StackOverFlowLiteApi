@@ -28,6 +28,7 @@ https://kiburu-stacklyte-api-heroku.herokuapp.com/
         "id": 1,
         "title": "Build an API",
         "description": "How does one build an api",
+        "user": "john doe",
         "answers": []
     }
     ```

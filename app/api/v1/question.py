@@ -66,7 +66,7 @@ class QuestionAnswer(Resource):
     @api.marshal_with(answer, as_list=True)
     def get(self, id):
         """Fetch a given question\'s answers """
-        return QuestionMaker.get_answers(id)
+        return QuestionMaker.get_answers(id), 200
 
     @ns.doc('create_answer')
     @ns.marshal_with(answer, code=201)
