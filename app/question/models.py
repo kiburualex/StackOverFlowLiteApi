@@ -6,6 +6,7 @@ class Question():
                 "id": 1,
                 "title": "Build an API",
                 "description": "How does one build an api",
+                "user": "john doe",
                 "answers": [
                     {
                         "id": 1,
@@ -23,20 +24,22 @@ class Question():
         self.api.abort(404, "Question {} doesn't exist".format(question_id))
 
     def create(self, data):
-        question = dict()
-        question['title'] = str(data.get('title'))
-        question['description'] = str(data.get('description'))
-        question['answers'] = []
+        if data and str(data["title"]).strip() and data["description"].strip() and data["user"].strip():
+            question = dict()
+            question['title'] = str(data.get('title'))
+            question['user'] = str(data.get('user'))
+            question['description'] = str(data.get('description'))
+            question['answers'] = []
 
-        """ Ensure table id column value is unique """
-        try:
-            question['id'] = int(self.questions[-1].get('id')) + 1
-        except Exception as e:
-            question['id'] = 1
+            """ Ensure table id column value is unique """
+            try:
+                question['id'] = int(self.questions[-1].get('id')) + 1
+            except Exception as e:
+                question['id'] = 1
 
-        self.questions.append(question)
-
-        return question
+            self.questions.append(question)
+            return question
+        self.api.abort(400, "Incorrect Question Format")
 
     def update(self, id, data):
         question = self.get(id)
@@ -52,9 +55,11 @@ class Question():
         return question['answers']
 
     def create_answer(self, id, data):
-        question = self.get(id)
-        question['answers'].append(data)
-        return data
+        if data and str(data["id"]).strip() and data["user"].strip() and data["answer"].strip():
+            question = self.get(id)
+            question['answers'].append(data)
+            return data
+        self.api.abort(400, "Incorrect Answer Format")
 
     def delete_answer(self, question_id, answer_id):
         question = self.get(question_id)
