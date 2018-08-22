@@ -1,68 +1,87 @@
-class Question():
+from app.dbmanager import Database
+from app.user.models import User
+
+
+class Question:
     def __init__(self, api):
         self.api = api
-        self.questions = [
-            {
-                "id": 1,
-                "title": "Build an API",
-                "description": "How does one build an api",
-                "user": "john doe",
-                "answers": [
-                    {
-                        "id": 1,
-                        "answer": "Sample Answer",
-                        "user": "Paul"
-                    }
-                ]
-            }
-        ]
+        self.db = Database()
+        self.users = User(api)
 
-    def get(self, question_id):
-        for question in self.questions:
-            if question['id'] == question_id:
-                return question
-        self.api.abort(404, "Question {} doesn't exist".format(question_id))
+    def fetch_all(self):
+        self.db.query("SELECT * FROM questions")
+        questions_tuple = self.db.cur.fetchall()
+        questions = []
+        for question in questions_tuple:
+            questions.append(self.question_serializer(question))
+        return questions
 
     def create(self, data):
-        if data and str(data["title"]).strip() and data["description"].strip() and data["user"].strip():
-            question = dict()
-            question['title'] = str(data.get('title'))
-            question['user'] = str(data.get('user'))
-            question['description'] = str(data.get('description'))
-            question['answers'] = []
+        question = dict()
+        question['title'] = str(data.get('title'))
+        question['description'] = str(data.get('description'))
+        question['user_id'] = str(data.get('user_id'))
 
-            """ Ensure table id column value is unique """
-            try:
-                question['id'] = int(self.questions[-1].get('id')) + 1
-            except Exception as e:
-                question['id'] = 1
+        """ checks if user id exists"""
+        self.users.get_user_by_id(question['user_id'])
 
-            self.questions.append(question)
-            return question
-        self.api.abort(400, "Incorrect Question Format")
+        if self.check_if_question_exists(question['title']) is False:
+            self.db.query(
+                """
+                INSERT INTO questions (title, description, user_id)
+                VALUES (%s , %s, %s) RETURNING id;
+                """,
+                (question['title'], question['description'], question['user_id']))
+            question_id = self.db.cur.fetchone()[0]
+            self.db.save()
+
+            return self.get_question_by_id(question_id)
+        self.api.abort(409, "Question ({}) already exists".format(question['title']))
 
     def update(self, id, data):
-        question = self.get(id)
-        question.update(data)
+        self.db.query("UPDATE questions SET title = %s, description \
+            = %s WHERE id \
+            = %s;", (
+            data.get('title'),
+            data.get('description'), id)
+        )
+        question = self.get_question_by_id(id)
+        self.db.save()
         return question
 
     def delete(self, id):
-        question = self.get(id)
-        self.questions.remove(question)
+        """ check user exists first """
+        user = self.get_question_by_id(id)
+        self.db.query(
+            "DELETE FROM questions WHERE id=%s", (id, ))
+        self.db.save()
+        return "Deleted Successfully"
 
-    def get_answers(self, id):
-        question = self.get(id)
-        return question['answers']
+    def check_if_question_exists(self, title):
+        """ check if user with the same username already exist """
+        self.db.query("SELECT * FROM questions WHERE title = %s;", (title,))
+        question = self.db.cur.fetchone()
+        self.db.save()
+        if question:
+            return self.question_serializer(question)
+        else:
+            return False
 
-    def create_answer(self, id, data):
-        if data and str(data["id"]).strip() and data["user"].strip() and data["answer"].strip():
-            question = self.get(id)
-            question['answers'].append(data)
-            return data
-        self.api.abort(400, "Incorrect Answer Format")
+    def get_question_by_id(self, id):
+        """ Serialize tuple into dictionary """
+        self.db.query("SELECT * FROM questions WHERE id = %s;", (id,))
+        question = self.db.cur.fetchone()
+        if question:
+            return self.question_serializer(question)
+        self.api.abort(404, "Question {} doesn't exist".format(id))
 
-    def delete_answer(self, question_id, answer_id):
-        question = self.get(question_id)
-        answer = list(filter(lambda d: d['id'] in [int(answer_id)], question['answers']))
-        """ return a list and get the first element matching query """
-        question['answers'].remove(answer[0])
+    def question_serializer(self, question):
+        """ Serialize tuple into dictionary """
+        question_details = dict(
+            id=question[0],
+            title=question[1],
+            description=question[2],
+            user_id=question[3]
+        )
+        return question_details
+

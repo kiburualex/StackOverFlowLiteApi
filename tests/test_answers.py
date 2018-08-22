@@ -15,7 +15,7 @@ class AnswerTestCase(BaseTestCase):
         question = {
             "title": 'Build an API',
             "description": "How does one build an api",
-            "user": "john doe"
+            "user_id": 1
         }
         response = self.client.post(self.endpoint,
                                     data=json.dumps(question),
@@ -35,8 +35,8 @@ class AnswerTestCase(BaseTestCase):
         """ Post answers """
         answer = {
             'id': 1,
-            'answer': 'Sample Answer',
-            'user': 'Leah'
+            'description': 'Sample Answer',
+            'user_id': 1
         }
         answer_response = self.client.post(self.endpoint + question_id + '/answer',
                                            data=json.dumps(answer),
@@ -50,7 +50,7 @@ class AnswerTestCase(BaseTestCase):
         question = {
             "title": 'Build an API',
             "description": "How does one build an api",
-            "user": "john doe"
+            "user_id": 1
         }
         response = self.client.post(self.endpoint,
                                     data=json.dumps(question),
@@ -71,7 +71,7 @@ class AnswerTestCase(BaseTestCase):
         answer = {
             'id': 1,
             'answer': '',
-            'user': ' '
+            'user_id': ' '
         }
         answer_response = self.client.post(self.endpoint + question_id + '/answer',
                                            data=json.dumps(answer),
