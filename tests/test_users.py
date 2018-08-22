@@ -32,9 +32,10 @@ class UserTestCase(BaseTestCase):
 
         user = {
             "id": 1,
-            "name": "Alex Kiburu",
+            "username": "Alex Kiburu",
             "email": "alexkiburu18@gmail.com",
-            "password": "saf&&#d12"
+            "password": "saf&&#d12",
+            "role": "customer"
         }
         response = self.client.put(self.endpoint + '1/',
                                     data=json.dumps(user),
@@ -48,10 +49,11 @@ class UserTestCase(BaseTestCase):
     def test_register_user(self):
         """Test API can create a user (POST request)"""
         user = {
-            'id': 1,
-            'name': 'Alex Kiburu',
-            'email': 'alexkiburu18@gmail.com',
-            'password': 'saf&&#d12'
+            "id": 1,
+            "username": "Alex Kiburu",
+            "email": "alexkiburu18@gmail.com",
+            "password": "saf&&#d12",
+            "role": "customer"
         }
         response = self.client.post(self.endpoint,
                                     data=json.dumps(user),

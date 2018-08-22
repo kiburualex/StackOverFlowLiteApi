@@ -3,6 +3,7 @@ import unittest
 from app.api.v1 import api
 from app.api.v1.question import ns as questions_namespace
 from app.api.v1.user import ns as users_namespace
+from app.dbmanager import Database
 from config import create_app
 
 
@@ -18,3 +19,10 @@ class BaseTestCase(unittest.TestCase):
         api.add_namespace(users_namespace)
 
         self.client = self.app.test_client()
+        self.db = Database('Testing')
+        self.db.create_tables()
+        self.db.create_initial_data()
+
+    def tearDown(self):
+        self.db.drop_tables()
+        self.db.close()
