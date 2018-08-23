@@ -3,31 +3,29 @@ import logging
 from flask_restplus import Resource
 from app.api.v1 import api
 from app.api.v1.serializers import question_model
-from app.question.models import Question
+from app.modules.question.models import Question
 
 log = logging.getLogger(__name__)
 
 ns = api.namespace('api/v1/questions', description='Operations related to Questions')
 
-question = Question(api)
-
 
 @ns.route('/')
-class Questions(Resource):
+class QuestionsMethods(Resource):
     """Shows a list of all questions, and lets you POST to add new question"""
 
     @ns.doc('list_questions')
     @ns.marshal_list_with(question_model)
     def get(self):
         """List all questions"""
-        return question.fetch_all()
+        return Question().fetch_all()
 
     @ns.doc('create_question')
     @ns.expect(question_model)
     @ns.marshal_with(question_model, code=201)
     def post(self):
         """Create a new question"""
-        return question.create(api.payload), 201
+        return Question(api.payload).save(), 201
 
 
 @ns.route('/<int:id>')
@@ -40,17 +38,18 @@ class QuestionDetail(Resource):
     @ns.marshal_with(question_model)
     def get(self, id):
         """Fetch a given resource"""
-        return question.get_question_by_id(id)
+        return Question({"id": id}).get_by_id()
 
     @ns.doc('delete_question')
     @ns.response(204, 'Question deleted')
     def delete(self, id):
         """Delete a question given its identifier"""
-        question.delete(id)
+        Question({"id": id}).delete()
         return '', 204
 
     @ns.expect(question_model)
     @ns.marshal_with(question_model)
     def put(self, id):
         """Update a question given its identifier"""
-        return question.update(id, api.payload)
+
+        return Question(api.payload).update()

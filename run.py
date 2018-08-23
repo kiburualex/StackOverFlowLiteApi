@@ -1,17 +1,24 @@
-import settings
-from app.api.v1 import api
-from app.api.v1.question import ns as questions_namespace
-from app.api.v1.user import ns as users_namespace
-from app.api.v1.answer import ns as answers_namespace
-from config import create_app
+import os
+import pytest
+from flask_script import Manager
+from app.create_app import create_app
+from app.migrations.db import db
 
-config_name = settings.APP_ENVIRONMENT_SETTINGS  # config_name = "development"
-app = create_app(config_name)
+app = create_app('development')
+manager = Manager(app)
 
-api.init_app(app)
-api.add_namespace(questions_namespace)
-api.add_namespace(answers_namespace)
-api.add_namespace(users_namespace)
+
+@manager.command
+def test():
+    os.environ['APP_SETTINGS'] = 'TESTING'
+    db.migrate_test_db()
+    pytest.main(['-v', '--cov=tests'])
+    db.drop_test_database()
+
+@manager.command
+def run():
+    app.run()
+
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    manager.run()

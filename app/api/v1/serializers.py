@@ -3,16 +3,16 @@ from app.api.v1 import api
 
 question_model = api.model('Question', {
     'id': fields.Integer(readOnly=True, description='The question unique identifier'),
+    'user_id': fields.Integer(required=False, description='The id of the user'),
     'title': fields.String(required=False, description='The title of the Question'),
-    'description': fields.String(required=False, description='The question details'),
-    'user_id': fields.Integer(required=False, description='The id of the user')
+    'body': fields.String(required=False, description='The body of the Question')
 })
 
 answer_model = api.model('Answer', {
     'id': fields.Integer(description='The question unique identifier'),
     'user_id': fields.Integer(description='The id of the user'),
     'question_id': fields.Integer(description='The id of the question'),
-    'description': fields.String(description='The description of the answer'),
+    'answer_body': fields.String(description='The description of the answer'),
     'accepted': fields.Boolean(description='The status of the answers (if accepted as the right answer')
 })
 

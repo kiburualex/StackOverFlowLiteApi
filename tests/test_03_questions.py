@@ -20,6 +20,8 @@ class QuestionTestCase(BaseTestCase):
 
     def test_api_can_get_question_by_id(self):
         """Test API can get a single question by using it's id."""
+        self.post_one_user()
+        self.post_one_question()
         response = self.client.get(self.endpoint + '1/')
         self.assertEqual(response.status_code, 200)
 
@@ -30,11 +32,12 @@ class QuestionTestCase(BaseTestCase):
 
     def test_question_can_be_edited(self):
         """Test API can edit an existing question. (PUT request)"""
-
+        self.post_one_user()
+        self.post_one_question()
         question = {
             "id": 1,
             "title": "Build an API",
-            "description": "How does one build an api",
+            "body": "How does one build an api",
             "user_id": 1
         }
         response = self.client.put(self.endpoint + '1/',
@@ -44,7 +47,26 @@ class QuestionTestCase(BaseTestCase):
         results = self.client.get(self.endpoint + '1/')
 
         content = json.loads(results.get_data(as_text=True))
-        self.assertEqual(content, question)
+        self.assertEqual(content['title'], question['title'])
+
+    def test_question_can_be_posted(self):
+
+        self.post_one_user()
+
+        question = {
+            "id": 1,
+            "title": "Build an API",
+            "body": "How does one build an api",
+            "user_id": 1
+        }
+        response = self.client.post(self.endpoint,
+                                    data=json.dumps(question),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        results = self.client.get(self.endpoint + '1/')
+
+        content = json.loads(results.get_data(as_text=True))
+        self.assertEqual(content['title'], question['title'])
 
 
 if __name__ == '__main__':
