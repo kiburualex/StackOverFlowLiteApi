@@ -2,13 +2,17 @@ import psycopg2
 import psycopg2.extensions
 from psycopg2.extras import RealDictCursor
 from config import BaseConfig
-from app.utils import db_config
+from app.utils.utils import db_config
 from app.api.v1 import api
 from app.modules.question.models import Question
+from app.modules.user.models import User
 
 
 class Answer:
     def __init__(self, data={}):
+
+        """ Dynamic Databse URI config """
+
         self.config = db_config(BaseConfig.DATABASE_URI)
         self.table = 'answers'
         self.answer_body = data.get('answer_body')
@@ -18,12 +22,29 @@ class Answer:
         self.user_id = data.get('user_id')
 
     def save(self):
+
         """
-        Creates an answer record in answers table
-        :return: None of inserted record
+            Creates an answer record in answers table
+            :return: None of inserted record
         """
+
         con, response = psycopg2.connect(**self.config), None
         cur = con.cursor(cursor_factory=RealDictCursor)
+
+        if not self.answer_body or not str(self.question_id).isdigit() or \
+                not str(self.user_id).isdigit():
+            api.abort(400, "Incorrect Data Format. Try again")
+
+        """ check if questions exists """
+        Question({"id": self.question_id}).get_by_id()
+
+        """ check if user exists """
+        User({"id": self.user_id}).get_by_id()
+
+        answer_exists = self.filter_by_body()
+
+        if answer_exists:
+            api.abort(409, "Answer with that title already exists.")
 
         if self.answer_body.strip() and type(self.user_id) == int and type(self.question_id) == int:
             try:
@@ -38,113 +59,115 @@ class Answer:
         api.abort(400, "Incorrect Input Data".format(self.answer_id))
 
     def fetch_all(self):
+
         """
-        Fetch all records from a answers table
-        :return: list: query set
+            Fetch all records from a answers table
+            :return: list: query set
         """
+
+        """ check first if question exists """
         Question({"id": self.question_id}).get_by_id()
+
         con = psycopg2.connect(**self.config)
         cur = con.cursor(cursor_factory=RealDictCursor)
         query = "SELECT * FROM answers WHERE question_id=%s"
         cur.execute(query, [self.question_id])
+
         queryset_list = cur.fetchall()
         con.close()
+
         return queryset_list
 
-    def question_author(self):
-        con = psycopg2.connect(**self.config)
-        try:
-            cur = con.cursor(cursor_factory=RealDictCursor)
-            query = "SELECT user_id FROM questions WHERE id=%s"
-            cur.execute(query, self.question_id)
-            return cur.fetchall()
+    def filter_by_body(self):
 
+        """ Fetch User By Email """
+
+        """ validate data """
+        if not self.answer_body:
+            api.abort(400, "Incorrect Data Format. Try again")
+
+        con, results = psycopg2.connect(**self.config), None
+        cur = con.cursor(cursor_factory=RealDictCursor)
+
+        try:
+            cur.execute("select * from {} WHERE answer_body='{}'".format(self.table, self.answer_body))
+            results = cur.fetchone()
         except Exception as e:
             print(e)
+
         con.close()
-        return False
+        return results
 
-    def answer_author(self):
-        try:
-            con = psycopg2.connect(**self.config)
-            cur = con.cursor(cursor_factory=RealDictCursor)
-            query = "SELECT user_id FROM answers WHERE id=%s"
-            cur.execute(query, self.answer_id)
-            queryset_list = cur.fetchall()
-            con.close()
-            return queryset_list
-        except Exception as e:
-            return False
+    def update(self):
 
-    def update_answer(self):
+        """ Update an Answer """
+
+        """ validate the answer details """
+
+        if not self.answer_body:
+            api.abort(400, "Incorrect Data Format. Try again")
+
+        if type(self.accepted) != bool:
+            api.abort(400, "Not a boolean (e.g True or False). Try again")
+
         con, result = psycopg2.connect(**self.config), True
         cur = con.cursor(cursor_factory=RealDictCursor)
+
         try:
-            query = "UPDATE answers SET answer_body=%s WHERE id=%s"
-            cur.execute(query, (self.answer_body, self.answer_id))
+
+            query = "UPDATE answers SET answer_body=%s, accepted=%s WHERE id=%s"
+            cur.execute(query, (self.answer_body, self.accepted, self.answer_id))
             con.commit()
             con.close()
+
             return self.get_by_id()
-        except Exception as e:
-            print(e)
 
-        api.abort(404, "Answer {} doesn't exist".format(self.answer_id))
-
-    def accept(self, id):
-        con, result = psycopg2.connect(**self.config), True
-        cur = con.cursor(cursor_factory=RealDictCursor)
-        try:
-            query = "UPDATE answers SET accepted=%s WHERE id=%s AND question_id=%s"
-            cur.execute(query, (True, self.answer_id, self.question_id))
-            con.commit()
-            con.close()
-            return self.get_by_id()
-        except Exception as e:
-            print(e)
-
-        api.abort(404, "Answer {} doesn't exist".format(self.answer_id))
-
-    def deny(self, id):
-        con, result = psycopg2.connect(**self.config), True
-        cur = con.cursor(cursor_factory=RealDictCursor)
-        try:
-            query = "UPDATE answers SET accepted=%s WHERE id=%s AND question_id=%s"
-            cur.execute(query, (False, self.answer_id, self.question_id))
-            con.commit()
-            con.close()
-            return self.get_by_id()
         except Exception as e:
             print(e)
 
         api.abort(404, "Answer {} doesn't exist".format(self.answer_id))
 
     def delete(self):
-        self.get_by_id()  # check user exists first
+        """ Delete an answer """
+
+        """ check if answer id exists """
+        self.get_by_id()
+
         con = psycopg2.connect(**self.config)
         cur = con.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
         try:
+
             query = "DELETE FROM answers WHERE id=%s"
             cur.execute(query, [self.answer_id])
             con.commit()
             con.close()
+
+            return {"status": "success", "message": "answer deleted successfully"}, 202
         except Exception as e:
             print(e)
-            con.close()
-            return False
-        return True
+        con.close()
+        return {"status": "fail", "message": "failed to delete answer"}, 400
 
     def get_by_id(self):
+
+        """ Get answer by Id """
+
         con, response = psycopg2.connect(**self.config), None
         cur = con.cursor(cursor_factory=RealDictCursor)
+
         try:
+
             query = "SELECT * FROM answers WHERE id = %s;"
             cur.execute(query, [self.answer_id])
             con.commit()
             response = cur.fetchone()
+
             if response:
                 return response
-            self.api.abort(404, "Answer {} doesn't exist".format(self.answer_id))
-            con.close()
+
         except Exception as e:
             print(e)
+
+        con.close()
         api.abort(404, "Answer {} doesn't exist".format(self.answer_id))

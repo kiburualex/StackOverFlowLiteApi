@@ -9,11 +9,32 @@ class AnswerTestCase(BaseTestCase):
     endpoint = 'api/v1/questions/'
 
     def test_post_answer(self):
-        """Test API can create a question (POST request)"""
-        self.post_one_user()
-        self.post_one_question()
 
-        """ Post answers """
+        """ Test API can create a an Answer """
+
+        """
+            Initial user registration and login
+        """
+        self.signup_user()
+        login_response = self.user_login()
+
+        """
+            Header with Authorization token from logged in user above
+        """
+        auth_headers = dict(
+            Authorization=json.loads(
+                login_response.data.decode())['Authorization']
+        )
+
+        """
+            Create an initial question
+            @:param ( users_id, Authorization token )
+        """
+        self.post_one_question(auth_headers)
+
+        """ 
+            Simulate answer creation
+        """
         answer = {
             "id": 1,
             "user_id": 1,
@@ -22,16 +43,32 @@ class AnswerTestCase(BaseTestCase):
         }
         answer_response = self.client.post(self.endpoint + '1/answers',
                                            data=json.dumps(answer),
-                                           content_type='application/json')
+                                           content_type='application/json',
+                                           headers=auth_headers)
         self.assertEqual(answer_response.status_code, 201)
 
     def test_post_answer_with_incorrect_inputs(self):
-        """Test API can create a question (POST request)"""
 
-        self.post_one_user()
-        self.post_one_question()
+        """ Test API post Answer with incorrect input data """
 
-        """ Post answers """
+        """
+            Initial user registration and login
+        """
+        self.signup_user()
+        login_response = self.user_login()
+
+        """
+            Header with Authorization token from logged in user above
+        """
+        auth_headers = dict(
+            Authorization=json.loads(
+                login_response.data.decode())['Authorization']
+        )
+        self.post_one_question(auth_headers)
+
+        """ 
+            Simulate answer creation
+        """
         answer = {
             'id': 1,
             'answer_body': '',
@@ -39,17 +76,41 @@ class AnswerTestCase(BaseTestCase):
         }
         answer_response = self.client.post(self.endpoint + '1/answers',
                                            data=json.dumps(answer),
-                                           content_type='application/json')
+                                           content_type='application/json',
+                                           headers=auth_headers)
         self.assertEqual(answer_response.status_code, 400)
 
         answer_content = json.loads(answer_response.get_data(as_text=True))
-        self.assertEqual(answer_content['message'], "Incorrect Input Data")
+        self.assertEqual(answer_content['message'], "Incorrect Data Format. Try again")
 
     def test_api_can_get_answers_of_a_question_by_question_id(self):
-        """ Test API can get answers of question by question id."""
-        self.post_one_user()
-        self.post_one_question()
-        response = self.client.get(self.endpoint + '1/answers')
+
+        """ Test API can get answers of question by question id. """
+
+        """
+            Initial user registration and login
+        """
+        self.signup_user()
+        login_response = self.user_login()
+
+        """
+            Header with Authorization token from logged in user above
+        """
+        auth_headers = dict(
+            Authorization=json.loads(
+                login_response.data.decode())['Authorization']
+        )
+
+        """
+            Create an initial question
+            @:param ( users_id, Authorization token )
+        """
+        self.post_one_question(auth_headers)
+
+        """
+            GET request
+        """
+        response = self.client.get(self.endpoint + '1/answers', headers=auth_headers)
         self.assertEqual(response.status_code, 200)
 
         content = json.loads(response.get_data(as_text=True))
@@ -58,10 +119,34 @@ class AnswerTestCase(BaseTestCase):
         self.assertIsInstance(content, list)
 
     def test_api_can_get_answers_of_non_existing_id(self):
-        """ Test API can get answers of question by question id."""
-        self.post_one_user()
-        self.post_one_question()
-        response = self.client.get(self.endpoint + '100/answers')
+
+        """ Test API can get answers of question by question id. """
+
+        """
+            Initial user registration and login
+        """
+        self.signup_user()
+        login_response = self.user_login()
+
+        """
+            Header with Authorization token from logged in user above
+        """
+        auth_headers = dict(
+            Authorization=json.loads(
+                login_response.data.decode())['Authorization']
+        )
+
+        """
+            Create an initial question
+            @:param ( users_id, Authorization token )
+
+        """
+        self.post_one_question(auth_headers)
+
+        """
+            GET request
+        """
+        response = self.client.get(self.endpoint + '100/answers', headers=auth_headers)
         self.assertEqual(response.status_code, 404)
 
         content = json.loads(response.get_data(as_text=True))

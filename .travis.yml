@@ -1,15 +1,25 @@
 language: python
-
 python:
-  - "3.5"
-
+- '3.5'
+services:
+- postgresql
 install:
-  - pip install -r requirements.txt
-  - pip install coveralls
-
-script: 
-  - py.test --cov=app
-
-
+- pip install -r requirements.txt
+- pip install coveralls
+before_script:
+- psql -c "CREATE DATABASE test_db;" -U postgres
+- psql -c "CREATE DATABASE stack;" -U postgres
+- psql -c "CREATE USER stack WITH PASSWORD 'stack';" -U postgres
+- psql -c "ALTER USER stack WITH SUPERUSER;" -U postgres
+#- psql -c 'CREATE ROLE stack SUPERUSER LOGIN CREATEDB WITH PASSWORD 'stack';' -U postgres
+deploy:
+  provider: heroku
+  api_key:
+    secure: plHdXVgPgpZrEeYEp40nRQIWNRE/CV4+4zL7DvdfQYIGLMhxbZpGBKneVApnBC3G0MbDZ0JKjBraYHAPQiC3JYLpNiYU+iqPfWTqv7lD6puAWuSbGZ9wMCEQagg+ECeFDDgj9cDX8D/f57upb5bhgqn7mPbamMPXCprDgHnMH2Nka0KSWJ5hZGcvzDLt+QxmvujujabbZSu7ghse8WdVqDkI8JadO3V5pVQXmwJMHVbyWJflnJX2oVrxfUlbSJ+AkKO25gCFPGdbStJOpP6YD6t7Hb24rruTGbePYqov3vNF1DthFQJkto7ir2kbGlPTqfK5mmbRL1lvG9nES/D8CEZ8z7r3VfnYPSgWQa0n2xun2ntPOrO6Y1g5ogNIQGbbjTsYr3mc4VG7RzYDopBpl/6VRI3djCT1FkwC5k4aS1/6TBvTPSISXHWZ3p1KRWBx0cvKNfdg2mzj1+jANThmxudVAtmytTlh/lSoI/BKf404hiYR3pvAfiTugLjKdOcezU5/bLzjOtKJt5OsJfuqHgi6THl8XibyyZpkUSm2Lja99Vfdc/0oDEYShJ4oZXvWmMV46F2OlUED3HkYwfa/ZpTPIG3nT/U5do29ECR3RyT9LDE5hZB5RWB9jQBxLjQASgr8CzPXqetz+MJt7T5srONkkM6YGIYQjEXzaGe7Sho=
+  app: kiburu-stacklyte-api-heroku
+  on:
+    repo: kiburualex/StackOverFlowLiteApi
+script:
+- py.test --cov=app -v
 after_success:
 - coveralls
