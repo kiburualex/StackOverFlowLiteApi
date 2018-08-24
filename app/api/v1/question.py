@@ -4,6 +4,7 @@ from flask_restplus import Resource
 from app.api.v1 import api
 from app.api.v1.serializers import question_model
 from app.modules.question.models import Question
+from app.utils.token_decorator import token_required
 
 log = logging.getLogger(__name__)
 
@@ -12,19 +13,22 @@ ns = api.namespace('api/v1/questions', description='Operations related to Questi
 
 @ns.route('/')
 class QuestionsMethods(Resource):
-    """Shows a list of all questions, and lets you POST to add new question"""
 
-    @ns.doc('list_questions')
+    @token_required
     @ns.marshal_list_with(question_model)
     def get(self):
+
         """List all questions"""
+
         return Question().fetch_all()
 
-    @ns.doc('create_question')
+    @token_required
     @ns.expect(question_model)
     @ns.marshal_with(question_model, code=201)
     def post(self):
+
         """Create a new question"""
+
         return Question(api.payload).save(), 201
 
 
@@ -32,24 +36,28 @@ class QuestionsMethods(Resource):
 @ns.response(404, 'Question not found')
 @ns.param('id', 'The question identifier')
 class QuestionDetail(Resource):
-    """Show a single question item and lets you delete them"""
 
-    @ns.doc('get_question')
+    @token_required
     @ns.marshal_with(question_model)
     def get(self, id):
+
         """Fetch a given resource"""
+
         return Question({"id": id}).get_by_id()
 
-    @ns.doc('delete_question')
-    @ns.response(204, 'Question deleted')
+    @token_required
+    @ns.response(202, 'Question deleted')
     def delete(self, id):
-        """Delete a question given its identifier"""
-        Question({"id": id}).delete()
-        return '', 204
 
+        """Delete a question given its identifier"""
+
+        return Question({"id": id}).delete(), 202
+
+    @token_required
     @ns.expect(question_model)
     @ns.marshal_with(question_model)
     def put(self, id):
+
         """Update a question given its identifier"""
 
         return Question(api.payload).update()

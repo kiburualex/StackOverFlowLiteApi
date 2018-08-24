@@ -1,13 +1,19 @@
 import unittest
 import json
 from app.create_app import create_app
+from app.migrations.db import db
 
 
 class BaseTestCase(unittest.TestCase):
     """ Base Test case class, initialize variables and settings """
 
     def setUp(self):
+
         """Define test variables and initialize app."""
+
+        """ create the database and the tables """
+        db.migrate_test_db()
+
         self.app = create_app("testing")
         self.client = self.app.test_client()
 
@@ -18,22 +24,34 @@ class BaseTestCase(unittest.TestCase):
             "user_id": 1
         }
 
-
         user = {
             "id": 1,
             "username": "Alex Kiburu",
-            "email": "alexkiburu18@gmail.com",
-            "password": "saf&&#d12",
+            "email": "admin@example.com",
+            "password": "admin123",
             "role": "customer"
         }
 
-        self.post_one_user = lambda x=None: self.client.post('api/v1/users/',
-                                                             data=json.dumps(user),
-                                                             content_type='application/json')
-        self.post_one_question = lambda x=None: self.client.post('api/v1/questions/',
-                                                                 data=json.dumps(question),
-                                                                 content_type='application/json')
+        user_login = {
+            "email": "admin@example.com",
+            "password": "admin123"
+        }
+
+        """ lambda functions to return responses """
+        self.signup_user = lambda x=None: self.client.post('api/v1/auth/signup/',
+                                                           data=json.dumps(user),
+                                                           content_type='application/json')
+
+        self.user_login = lambda x=None: self.client.post('api/v1/auth/login/',
+                                                          data=json.dumps(user_login),
+                                                          content_type='application/json')
+
+        self.post_one_question = lambda auth_headers: self.client.post('api/v1/questions/',
+                                                                       data=json.dumps(question),
+                                                                       content_type='application/json',
+                                                                       headers=auth_headers)
 
     def tearDown(self):
-        """ drop all the test database """
-        pass
+
+        """ drop the database """
+        db.drop_test_database()

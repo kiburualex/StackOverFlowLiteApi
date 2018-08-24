@@ -4,6 +4,10 @@ import os
 
 class BaseConfig(object):
 
+    """
+        Base Configuration for the Entire App
+    """
+
     basedir = os.path.abspath(os.path.dirname(__file__))
     DATABASE_URI = "postgresql://stack:stack@127.0.0.1:5432/stack"
     TEST_DB = 'test_db'
@@ -19,16 +23,29 @@ class BaseConfig(object):
 
 class DevelopmentConfig(BaseConfig):
 
+    """
+        Development Environment Configuration
+    """
+
     DEBUG = True
 
 
 class TestingConfig(BaseConfig):
+
+    """
+        Testing Environment Configuration
+    """
 
     DEBUG = True
     TESTING = True
 
 
 class ProductionConfig(BaseConfig):
+
+    """
+        Production Environment Configuration
+    """
+
     DEBUG = False
 
 
@@ -37,3 +54,5 @@ app_config = {
     'testing': TestingConfig,
     'production': ProductionConfig,
 }
+
+key = BaseConfig.SECRET_KEY
