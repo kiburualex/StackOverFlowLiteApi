@@ -3,6 +3,9 @@ import pytest
 from flask_script import Manager
 from app.create_app import create_app
 from app.migrations.db import db
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 app = create_app('development')
