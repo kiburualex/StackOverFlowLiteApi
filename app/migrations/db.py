@@ -43,15 +43,6 @@ class Database:
         con.autocommit = True
         cur = con.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        print('\n* check test_db exists \n')
-
-        cur.execute("select * from pg_database where datname = %(database_name)s",
-                    {'database_name': BaseConfig.TEST_DB})
-        databases = cur.fetchall()
-        if len(databases) > 0:
-            cur.execute('DROP DATABASE {};'.format(BaseConfig.TEST_DB))
-            con.commit()
-
         print('\n* Creating test db\n')
 
         try:

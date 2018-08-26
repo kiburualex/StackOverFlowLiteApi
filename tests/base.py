@@ -47,6 +47,8 @@ class BaseTestCase(unittest.TestCase):
         """
         signed_up_user = self.signup_user()
 
+        print(signed_up_user)
+
         """
             Header with Authorization token from logged in user above
         """

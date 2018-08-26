@@ -12,40 +12,12 @@ class UserTestCase(BaseTestCase):
 
         """ Test API can get all users (GET request). """
 
-        """
-            Initial user registration and login
-        """
-        # self.signup_user()
-        # login_response = self.user_login()
-
-        """
-            Header with Authorization token from logged in user above
-        """
-        # auth_headers = dict(
-        #     Authorization=json.loads(
-        #         login_response.data.decode())['Authorization']
-        # )
-
         response = self.client.get(self.endpoint, headers=self.auth_headers)
         self.assertEqual(response.status_code, 200)
 
     def test_api_can_get_user_by_id(self):
 
         """ Test API can get a single user by using it's id. """
-
-        """
-            Initial user registration and login
-        """
-        # self.signup_user()
-        # login_response = self.user_login()
-
-        """
-            Header with Authorization token from logged in user above
-        """
-        # auth_headers = dict(
-        #     Authorization=json.loads(
-        #         login_response.data.decode())['Authorization']
-        # )
 
         response = self.client.get(self.endpoint + '1/', headers=self.auth_headers)
         self.assertEqual(response.status_code, 200)
@@ -54,40 +26,12 @@ class UserTestCase(BaseTestCase):
 
         """ Test a 404 error when user id is not found. """
 
-        """
-            Initial user registration and login
-        """
-        # self.signup_user()
-        # login_response = self.user_login()
-
-        """
-            Header with Authorization token from logged in user above
-        """
-        # auth_headers = dict(
-        #     Authorization=json.loads(
-        #         login_response.data.decode())['Authorization']
-        # )
-
         response = self.client.get(self.endpoint + '100/', headers=self.auth_headers)
         self.assertEqual(response.status_code, 404)
 
     def test_user_can_be_edited(self):
 
         """ Test API can edit an existing user. (PUT request) """
-
-        """
-            Initial user registration and login
-        """
-        # self.signup_user()
-        # login_response = self.user_login()
-
-        """
-            Header with Authorization token from logged in user above
-        """
-        # auth_headers = dict(
-        #     Authorization=json.loads(
-        #         login_response.data.decode())['Authorization']
-        # )
 
         user = {
             "id": 1,
@@ -111,20 +55,6 @@ class UserTestCase(BaseTestCase):
     def test_register_user(self):
 
         """ Test API can create a user (POST request) """
-
-        """
-            Initial user registration and login
-        """
-        # self.signup_user()
-        # login_response = self.user_login()
-
-        """
-            Header with Authorization token from logged in user above
-        """
-        # auth_headers = dict(
-        #     Authorization=json.loads(
-        #         login_response.data.decode())['Authorization']
-        # )
 
         user = {
             "id": 1,
