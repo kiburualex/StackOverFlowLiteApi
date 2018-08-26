@@ -38,7 +38,7 @@ class QuestionsMethods(Resource):
 class QuestionDetail(Resource):
 
     @token_required
-    @ns.marshal_with(question_model)
+    # @ns.marshal_with(question_model)
     def get(self, id):
 
         """Fetch a given resource"""

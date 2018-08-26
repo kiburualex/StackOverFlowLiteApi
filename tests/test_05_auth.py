@@ -12,23 +12,9 @@ class TestUserAuthentication(BaseTestCase):
         """ Test encoding authentication token """
 
         """
-            Initial user registration and login
-        """
-        self.signup_user()
-        login_response = self.user_login()
-
-        """
-            Header with Authorization token from logged in user above
-        """
-        auth_headers = dict(
-            Authorization=json.loads(
-                login_response.data.decode())['Authorization']
-        )
-
-        """ 
             GET Request
         """
-        response = self.client.get(self.endpoint + '1/', headers=auth_headers)
+        response = self.client.get(self.endpoint + '1/', headers=self.auth_headers)
         self.assertEqual(response.status_code, 200)
 
         """
@@ -36,7 +22,7 @@ class TestUserAuthentication(BaseTestCase):
         """
         content = json.loads(response.get_data(as_text=True))
 
-        """ 
+        """
             Encode data to generate token
         """
         auth_token = User().encode_auth_token(content['email'])
@@ -47,23 +33,9 @@ class TestUserAuthentication(BaseTestCase):
         """ Test decoding authentication token """
 
         """
-            Initial user registration and login
-        """
-        self.signup_user()
-        login_response = self.user_login()
-
-        """
-            Header with Authorization token from logged in user above
-        """
-        auth_headers = dict(
-            Authorization=json.loads(
-                login_response.data.decode())['Authorization']
-        )
-
-        """ 
             GET Request
         """
-        response = self.client.get(self.endpoint + '1/', headers=auth_headers)
+        response = self.client.get(self.endpoint + '1/', headers=self.auth_headers)
         self.assertEqual(response.status_code, 200)
 
         """
@@ -71,7 +43,7 @@ class TestUserAuthentication(BaseTestCase):
         """
         content = json.loads(response.get_data(as_text=True))
 
-        """ 
+        """
             Decode data to generate token
         """
         auth_token = User().encode_auth_token(content['email'])
@@ -83,14 +55,24 @@ class TestUserAuthentication(BaseTestCase):
 
         """ Test for login of registered-user login """
 
-        """ 
+        """
             Context Manager to execute multiple statements together
         """
         with self.client:
             """
                 Initial user registration
             """
-            user_response = self.signup_user()
+            user = {
+                "username": "Alex Kiburu",
+                "email": "alex@example.com",
+                "password": "alex123",
+                "role": "customer"
+            }
+
+            user_response = self.client.post('api/v1/auth/signup/',
+                                             data=json.dumps(user),
+                                             content_type='application/json')
+
             response_data = json.loads(user_response.data.decode())
 
             self.assertEqual(user_response.status_code, 201)
@@ -99,7 +81,14 @@ class TestUserAuthentication(BaseTestCase):
             """
              Initial registered user login
             """
-            login_response = self.user_login()
+            login_response = self.client.post('api/v1/auth/login/',
+                                              data=json.dumps(
+                                                  {
+                                                      "email": user['email'],
+                                                      "password": user['password']
+                                                   }
+                                              ),
+                                              content_type='application/json')
             data = json.loads(login_response.data.decode())
 
             self.assertEqual(login_response.status_code, 200)
@@ -109,27 +98,26 @@ class TestUserAuthentication(BaseTestCase):
 
         """ Test for logout before token expires """
 
-        """ 
+        """
             Context Manager to execute multiple statements together
         """
         with self.client:
             """
                 Initial user registration
             """
-            user_response = self.signup_user()
+            user = {
+                "username": "Alex Kiburu",
+                "email": "alex@example.com",
+                "password": "alex123",
+                "role": "customer"
+            }
+            user_response = self.client.post('api/v1/auth/signup/',
+                                             data=json.dumps(user),
+                                             content_type='application/json')
             response_data = json.loads(user_response.data.decode())
-            print(response_data)
 
             self.assertTrue(response_data[0]['Authorization'])
             self.assertEqual(user_response.status_code, 201)
-
-            """
-                Initial registered user login
-            """
-            login_response = self.user_login()
-            data = json.loads(login_response.data.decode())
-            self.assertEqual(login_response.status_code, 200)
-            self.assertTrue(data['Authorization'])
 
             """
                 valid token logout
@@ -138,8 +126,8 @@ class TestUserAuthentication(BaseTestCase):
                 'api/v1/auth/logout',
                 headers=dict(
                     Authorization='Bearer ' + json.loads(
-                        login_response.data.decode()
-                    )['Authorization']
+                        user_response.data.decode()
+                    )[0]['Authorization']
                 )
             )
 

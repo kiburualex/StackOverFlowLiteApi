@@ -24,6 +24,7 @@ class User:
         self.username = data.get('username')
         self.role = data.get('role')
         self.table = 'users'
+        self.now = str(datetime.datetime.now())
 
         """ encrypt the password if provided """
         if data.get('password'):
@@ -132,9 +133,9 @@ class User:
         cur = con.cursor(cursor_factory=RealDictCursor)
 
         try:
-            query = "INSERT INTO users (username, email, role, password) \
-                     values(%s, %s, %s, %s) RETURNING *"
-            cur.execute(query, (self.username, self.email, self.role, self.password))
+            query = "INSERT INTO users (username, email, role, password, created_at) \
+                     values(%s, %s, %s, %s, %s) RETURNING *"
+            cur.execute(query, (self.username, self.email, self.role, self.password, self.now))
             con.commit()
             response = cur.fetchone()
         except Exception as e:
