@@ -35,7 +35,6 @@ class AnswerMethods(Resource):
 class AnswerDetails(Resource):
 
     @token_required
-    @ns.marshal_with(answer_model)
     def get(self, question_id, id):
 
         """Fetch a given question\'s answers """

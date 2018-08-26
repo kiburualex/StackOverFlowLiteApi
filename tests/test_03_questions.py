@@ -20,23 +20,9 @@ class QuestionTestCase(BaseTestCase):
         """ Test API can get all questions (GET request). """
 
         """
-            Initial user registration and login
-        """
-        self.signup_user()
-        login_response = self.user_login()
-
-        """
-            Header with Authorization token from logged in user above
-        """
-        auth_headers = dict(
-            Authorization=json.loads(
-                login_response.data.decode())['Authorization']
-        )
-
-        """
             GET request
         """
-        response = self.client.get(self.endpoint, headers=auth_headers)
+        response = self.client.get(self.endpoint, headers=self.auth_headers)
         self.assertEqual(response.status_code, 200)
 
     def test_api_can_get_question_by_id(self):
@@ -44,69 +30,23 @@ class QuestionTestCase(BaseTestCase):
         """ Test API can get a single question by using it's id. """
 
         """
-            Initial user registration and login
-        """
-        self.signup_user()
-        login_response = self.user_login()
-
-        """
-            Header with Authorization token from logged in user above
-        """
-        auth_headers = dict(
-            Authorization=json.loads(
-                login_response.data.decode())['Authorization']
-        )
-
-        """
             GET request
         """
-        self.post_one_question(auth_headers)
-        response = self.client.get(self.endpoint + '1/', headers=auth_headers)
+        # self.post_one_question(auth_headers)
+        response = self.client.get(self.endpoint + '1/', headers=self.auth_headers)
         self.assertEqual(response.status_code, 200)
 
     def test_error_status_on_not_found_question_id(self):
 
         """ Test a 404 error when question id is not found. """
 
-        """
-            Initial user registration and login
-        """
-        self.signup_user()
-        login_response = self.user_login()
-
-        """
-            Header with Authorization token from logged in user above
-        """
-        auth_headers = dict(
-            Authorization=json.loads(
-                login_response.data.decode())['Authorization']
-        )
-        response = self.client.get(self.endpoint + '100/', headers=auth_headers)
+        response = self.client.get(self.endpoint + '100/', headers=self.auth_headers)
         self.assertEqual(response.status_code, 404)
 
     def test_question_can_be_edited(self):
 
         """ Test API can edit an existing question. (PUT request) """
 
-        """
-            Initial user registration and login
-        """
-        self.signup_user()
-        login_response = self.user_login()
-
-        """
-            Header with Authorization token from logged in user above
-        """
-        auth_headers = dict(
-            Authorization=json.loads(
-                login_response.data.decode())['Authorization']
-        )
-
-        """
-            Create an initial question
-            @:param ( users_id, Authorization token )
-        """
-        self.post_one_question(auth_headers)
         question = {
             "id": 1,
             "title": "Build an API",
@@ -117,10 +57,10 @@ class QuestionTestCase(BaseTestCase):
         response = self.client.put(self.endpoint + '1/',
                                    data=json.dumps(question),
                                    content_type='application/json',
-                                   headers=auth_headers)
+                                   headers=self.auth_headers)
 
         self.assertEqual(response.status_code, 200)
-        results = self.client.get(self.endpoint + '1/', headers=auth_headers)
+        results = self.client.get(self.endpoint + '1/', headers=self.auth_headers)
 
         content = json.loads(results.get_data(as_text=True))
         self.assertEqual(content['title'], question['title'])
@@ -130,31 +70,19 @@ class QuestionTestCase(BaseTestCase):
         """
             Initial user registration and login
         """
-        self.signup_user()
-        login_response = self.user_login()
-
-        """
-            Header with Authorization token from logged in user above
-        """
-        auth_headers = dict(
-            Authorization=json.loads(
-                login_response.data.decode())['Authorization']
-        )
 
         question = {
-            "id": 1,
-            "title": "Build an API",
-            "body": "How does one build an api",
-            "user_id": 1
+            "title": "How is reactJS",
+            "body": "Just run the docs, you'll see"
         }
         response = self.client.post(self.endpoint,
                                     data=json.dumps(question),
                                     content_type='application/json',
-                                    headers=auth_headers)
+                                    headers=self.auth_headers)
 
         """ asset if status is 201 for created """
         self.assertEqual(response.status_code, 201)
-        results = self.client.get(self.endpoint + '1/', headers=auth_headers)
+        results = self.client.get(self.endpoint + '2/', headers=self.auth_headers)
 
         content = json.loads(results.get_data(as_text=True))
         self.assertEqual(content['title'], question['title'])

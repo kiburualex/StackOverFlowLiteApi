@@ -1,11 +1,14 @@
 import psycopg2
 import psycopg2.extensions
 from psycopg2.extras import RealDictCursor
+from datetime import datetime
 from config import BaseConfig
 from app.utils.utils import db_config
 from app.api.v1 import api
 from app.modules.question.models import Question
 from app.modules.user.models import User
+from flask import request
+from app.utils.auth_helper import Auth
 
 
 class Answer:
@@ -20,6 +23,8 @@ class Answer:
         self.answer_id = data.get('answer_id')
         self.accepted = data.get('accepted')
         self.user_id = data.get('user_id')
+        self.now = str(datetime.now())
+        self.logged_in_user_id = Auth.get_logged_in_user(request)[0]['data']['user_id']
 
     def save(self):
 
@@ -32,24 +37,25 @@ class Answer:
         cur = con.cursor(cursor_factory=RealDictCursor)
 
         if not self.answer_body or not str(self.question_id).isdigit() or \
-                not str(self.user_id).isdigit():
+                not str(self.logged_in_user_id).isdigit():
             api.abort(400, "Incorrect Data Format. Try again")
 
         """ check if questions exists """
         Question({"id": self.question_id}).get_by_id()
 
         """ check if user exists """
-        User({"id": self.user_id}).get_by_id()
+        User({"id": self.logged_in_user_id}).get_by_id()
 
         answer_exists = self.filter_by_body()
 
         if answer_exists:
             api.abort(409, "Answer with that title already exists.")
 
-        if self.answer_body.strip() and type(self.user_id) == int and type(self.question_id) == int:
+        if self.answer_body.strip() and type(self.logged_in_user_id) == int and type(self.question_id) == int:
             try:
-                query = "INSERT INTO answers (user_id, answer_body, question_id) VALUES (%s, %s, %s) RETURNING *; "
-                cur.execute(query, (self.user_id, self.answer_body, self.question_id))
+                query = "INSERT INTO answers (user_id, answer_body, question_id, created_at) \
+                        VALUES (%s, %s, %s, %s) RETURNING *; "
+                cur.execute(query, (self.logged_in_user_id, self.answer_body, self.question_id, self.now))
                 con.commit()
                 response = cur.fetchone()
             except Exception as e:

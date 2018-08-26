@@ -10,7 +10,7 @@ create_tables_commands = (
         email VARCHAR(255) NOT NULL,
         role VARCHAR(255) NOT NULL,
         password VARCHAR(500) NOT NULL,
-        created_at timestamp with time zone DEFAULT now()
+        created_at VARCHAR(255)
     )
     """,
     """
@@ -19,7 +19,7 @@ create_tables_commands = (
         user_id INTEGER NOT NULL,
         title VARCHAR(255) NOT NULL,
         body text NOT NULL,
-        created_at timestamp with time zone DEFAULT now(),
+        created_at VARCHAR(255),
         FOREIGN KEY (user_id)
             REFERENCES users (id)
             ON UPDATE CASCADE ON DELETE CASCADE
@@ -32,7 +32,7 @@ create_tables_commands = (
         question_id INTEGER NOT NULL,
         answer_body TEXT NOT NULL,
         accepted bool DEFAULT false,
-        created_at timestamp with time zone DEFAULT now(),
+        created_at VARCHAR(255),
         FOREIGN KEY (question_id)
             REFERENCES  questions (id)
             ON UPDATE CASCADE ON DELETE CASCADE,

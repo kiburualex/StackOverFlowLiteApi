@@ -1,9 +1,12 @@
 import psycopg2
 import psycopg2.extensions
 from psycopg2.extras import RealDictCursor
+from datetime import datetime
 from config import BaseConfig
 from app.utils.utils import db_config
 from app.api.v1 import api
+from flask import request
+from app.utils.auth_helper import Auth
 
 
 class Question:
@@ -18,6 +21,8 @@ class Question:
         self.q = data.get('q')
         self.question_id = data.get('id')
         self.user_id = data.get('user_id')
+        self.now = str(datetime.now())
+        self.logged_in_user_id = Auth.get_logged_in_user(request)[0]['data']['user_id']
 
     def save(self):
 
@@ -40,8 +45,8 @@ class Question:
 
         try:
 
-            query = "INSERT INTO questions (title, body, user_id) VALUES (%s, %s, %s) RETURNING *"
-            cur.execute(query, (self.title, self.body, self.user_id))
+            query = "INSERT INTO questions (title, body, user_id, created_at) VALUES (%s, %s, %s, %s) RETURNING *"
+            cur.execute(query, (self.title, self.body, self.logged_in_user_id, self.now))
             con.commit()
             response = cur.fetchone()
 
@@ -158,6 +163,13 @@ class Question:
             response = cur.fetchone()
 
             if response:
+
+                query2 = "SELECT * FROM answers WHERE question_id=%s"
+                cur.execute(query2, [self.question_id])
+
+                queryset_list = cur.fetchall()
+                response["answers"] = queryset_list
+
                 return response
 
         except Exception as e:
