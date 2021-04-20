@@ -24,7 +24,7 @@ MarkupSafe==1.0
 mccabe==0.6.1
 passlib==1.7.1
 psycopg2==2.7.5
-py==1.5.4
+py==1.10.0
 pycparser==2.18
 PyJWT==1.6.4
 pylint==2.1.1
